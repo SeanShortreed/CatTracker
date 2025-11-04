@@ -1,0 +1,34 @@
+[
+  {
+    "id": "clip-101",
+    "timestamp": "2024-03-19T08:13:48Z",
+    "camera": "Litter Room",
+    "duration_seconds": 12,
+    "thumbnail_url": "https://placekitten.com/200/200?image=1",
+    "video_url": "https://example.com/videos/clip-101.mp4"
+  },
+  {
+    "id": "clip-102",
+    "timestamp": "2024-03-19T12:41:58Z",
+    "camera": "Hallway",
+    "duration_seconds": 18,
+    "thumbnail_url": "https://placekitten.com/200/200?image=2",
+    "video_url": "https://example.com/videos/clip-102.mp4"
+  },
+  {
+    "id": "clip-103",
+    "timestamp": "2024-03-19T21:05:55Z",
+    "camera": "Litter Room",
+    "duration_seconds": 9,
+    "thumbnail_url": "https://placekitten.com/200/200?image=3",
+    "video_url": "https://example.com/videos/clip-103.mp4"
+  },
+  {
+    "id": "clip-104",
+    "timestamp": "2024-03-19T21:10:01Z",
+    "camera": "Living Room",
+    "duration_seconds": 20,
+    "thumbnail_url": "https://placekitten.com/200/200?image=4",
+    "video_url": "https://example.com/videos/clip-104.mp4"
+  }
+]

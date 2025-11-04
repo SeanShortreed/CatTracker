@@ -32,26 +32,6 @@
     <script>
       const catOptions = ["Mittens", "Shadow", "Pumpkin", "Luna", "Unknown"];
 
-      function renderClipCell(cell, clip) {
-        cell.innerHTML = "";
-        if (clip) {
-          const link = document.createElement("a");
-          link.href = clip.video_url;
-          link.target = "_blank";
-          link.rel = "noopener";
-
-          const img = document.createElement("img");
-          img.src = clip.thumbnail_url;
-          img.alt = `Clip ${clip.id}`;
-          img.loading = "lazy";
-
-          link.appendChild(img);
-          cell.appendChild(link);
-        } else {
-          cell.textContent = "No clip";
-        }
-      }
-
       function formatTimestamp(value) {
         const date = new Date(value);
         return date.toLocaleString();
@@ -88,16 +68,6 @@
       function renderEvents(events) {
         const tbody = document.getElementById("events-table");
         tbody.innerHTML = "";
-        if (!events.length) {
-          const row = document.createElement("tr");
-          const cell = document.createElement("td");
-          cell.colSpan = 5;
-          cell.className = "empty-state";
-          cell.textContent = "No litter-robot activity recorded yet.";
-          row.appendChild(cell);
-          tbody.appendChild(row);
-          return;
-        }
         for (const event of events) {
           const row = document.createElement("tr");
           row.classList.add("event-row");
@@ -121,30 +91,30 @@
           select.addEventListener("change", async (evt) => {
             const newCat = evt.target.value;
             try {
-              select.disabled = true;
-              row.classList.add("saving");
               const updated = await updateCat(event.id, newCat);
-              event.cat_id = updated.cat_id;
-              event.clip = updated.clip;
-              renderClipCell(clipCell, event.clip);
-              cameraCell.textContent = event.clip ? event.clip.camera : "-";
-              statusCell.textContent = event.clip
-                ? `Clip ${event.clip.id}`
-                : "Clip not available";
               showToast(`Saved cat assignment: ${updated.cat_id}`);
             } catch (error) {
               showToast(error.message, true);
               evt.target.value = event.cat_id;
-            } finally {
-              select.disabled = false;
-              row.classList.remove("saving");
             }
           });
           catCell.appendChild(select);
           row.appendChild(catCell);
 
           const clipCell = document.createElement("td");
-          renderClipCell(clipCell, event.clip);
+          if (event.clip) {
+            const link = document.createElement("a");
+            link.href = event.clip.video_url;
+            link.target = "_blank";
+            link.rel = "noopener";
+            const img = document.createElement("img");
+            img.src = event.clip.thumbnail_url;
+            img.alt = `Clip ${event.clip.id}`;
+            link.appendChild(img);
+            clipCell.appendChild(link);
+          } else {
+            clipCell.textContent = "No clip";
+          }
           row.appendChild(clipCell);
 
           const cameraCell = document.createElement("td");

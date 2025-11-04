@@ -1,4 +1,3 @@
-import importlib
 import json
 import shutil
 import tempfile
@@ -6,10 +5,7 @@ import unittest
 from pathlib import Path
 from typing import List
 
-try:  # pragma: no cover - exercised through unit tests
-    from fastapi.testclient import TestClient as FastAPITestClient
-except Exception:  # pragma: no cover - FastAPI always available in the app runtime
-    FastAPITestClient = None
+from fastapi.testclient import TestClient
 
 from app import storage
 from app.main import app
@@ -54,7 +50,7 @@ class TestEventApi(unittest.TestCase):
         ]
         self.storage.write_events(seed_events)
 
-        with create_test_client(app) as client:
+        with TestClient(app) as client:
             response = client.get("/api/events")
 
         self.assertEqual(response.status_code, 200)
@@ -70,7 +66,7 @@ class TestEventApi(unittest.TestCase):
         ]
         self.storage.write_events(seed_events)
 
-        with create_test_client(app) as client:
+        with TestClient(app) as client:
             response = client.patch("/api/events/2", json={"cat_id": "Pumpkin"})
 
         self.assertEqual(response.status_code, 200)
@@ -79,24 +75,6 @@ class TestEventApi(unittest.TestCase):
 
         written = json.loads(self.storage.events_file.read_text(encoding="utf-8"))
         self.assertEqual(written[1]["cat_id"], "Pumpkin")
-
-
-def create_test_client(app_instance):
-    """Return a test client compatible with multiple httpx versions."""
-
-    if FastAPITestClient is not None:
-        try:
-            return FastAPITestClient(app_instance)
-        except TypeError:
-            # httpx 0.28 removed the ``app`` keyword argument, which breaks the
-            # Starlette/FastAPI TestClient. In that case, fall back to an httpx
-            # client powered by ASGITransport so the tests remain runnable
-            # without requiring a global dependency downgrade.
-            pass
-
-    httpx = importlib.import_module("httpx")
-    transport = httpx.ASGITransport(app=app_instance)
-    return httpx.Client(transport=transport, base_url="http://testserver")
 
 
 if __name__ == "__main__":

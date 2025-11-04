@@ -46,12 +46,3 @@ persisting corrections.
 
 All updates are stored in `app/data/events.json`, keeping corrections across
 server restarts.
-
-## Testing
-
-Run the lightweight regression tests to confirm the API endpoints and JSON
-persistence work as expected:
-
-```bash
-python -m unittest
-```

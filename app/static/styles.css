@@ -49,20 +49,9 @@ th {
   background: #ddd;
 }
 
-.event-row.saving {
-  opacity: 0.55;
-}
-
 .status {
   font-size: 0.85rem;
   color: #1d7a46;
-}
-
-.empty-state {
-  padding: 2rem;
-  text-align: center;
-  color: #666;
-  font-style: italic;
 }
 
 .cat-select {

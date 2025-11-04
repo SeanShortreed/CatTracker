@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cat Tracker</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <h1>Cat Tracker</h1>
+    <p>
+      Review litter-robot events, inspect the closest Blink clip, and keep cat
+      assignments up to date.
+    </p>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Cat</th>
+            <th>Clip</th>
+            <th>Camera</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="events-table"></tbody>
+      </table>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="assertive"></div>
+
+    <script>
+      const catOptions = ["Mittens", "Shadow", "Pumpkin", "Luna", "Unknown"];
+
+      function formatTimestamp(value) {
+        const date = new Date(value);
+        return date.toLocaleString();
+      }
+
+      function showToast(message, isError = false) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.toggle("error", isError);
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2400);
+      }
+
+      function buildCatOptions(currentCat) {
+        const set = new Set(catOptions.concat(currentCat ? [currentCat] : []));
+        return Array.from(set.values());
+      }
+
+      async function updateCat(eventId, catId) {
+        const response = await fetch(`/api/events/${eventId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ cat_id: catId }),
+        });
+        if (!response.ok) {
+          const detail = await response.json().catch(() => ({ detail: "Update failed" }));
+          throw new Error(detail.detail || "Update failed");
+        }
+        return response.json();
+      }
+
+      function renderEvents(events) {
+        const tbody = document.getElementById("events-table");
+        tbody.innerHTML = "";
+        for (const event of events) {
+          const row = document.createElement("tr");
+          row.classList.add("event-row");
+
+          const timestampCell = document.createElement("td");
+          timestampCell.textContent = formatTimestamp(event.timestamp);
+          row.appendChild(timestampCell);
+
+          const catCell = document.createElement("td");
+          const select = document.createElement("select");
+          select.className = "cat-select";
+          for (const optionValue of buildCatOptions(event.cat_id)) {
+            const option = document.createElement("option");
+            option.value = optionValue;
+            option.textContent = optionValue;
+            if (optionValue === event.cat_id) {
+              option.selected = true;
+            }
+            select.appendChild(option);
+          }
+          select.addEventListener("change", async (evt) => {
+            const newCat = evt.target.value;
+            try {
+              const updated = await updateCat(event.id, newCat);
+              showToast(`Saved cat assignment: ${updated.cat_id}`);
+            } catch (error) {
+              showToast(error.message, true);
+              evt.target.value = event.cat_id;
+            }
+          });
+          catCell.appendChild(select);
+          row.appendChild(catCell);
+
+          const clipCell = document.createElement("td");
+          if (event.clip) {
+            const link = document.createElement("a");
+            link.href = event.clip.video_url;
+            link.target = "_blank";
+            link.rel = "noopener";
+            const img = document.createElement("img");
+            img.src = event.clip.thumbnail_url;
+            img.alt = `Clip ${event.clip.id}`;
+            link.appendChild(img);
+            clipCell.appendChild(link);
+          } else {
+            clipCell.textContent = "No clip";
+          }
+          row.appendChild(clipCell);
+
+          const cameraCell = document.createElement("td");
+          cameraCell.textContent = event.clip ? event.clip.camera : "-";
+          row.appendChild(cameraCell);
+
+          const statusCell = document.createElement("td");
+          statusCell.className = "status";
+          statusCell.textContent = event.clip
+            ? `Clip ${event.clip.id}`
+            : "Clip not available";
+          row.appendChild(statusCell);
+
+          tbody.appendChild(row);
+        }
+      }
+
+      async function loadEvents() {
+        try {
+          const response = await fetch("/api/events");
+          if (!response.ok) {
+            throw new Error("Failed to load events");
+          }
+          const events = await response.json();
+          renderEvents(events);
+        } catch (error) {
+          showToast(error.message, true);
+        }
+      }
+
+      loadEvents();
+    </script>
+  </body>
+</html>

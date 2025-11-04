@@ -1,0 +1,95 @@
+:root {
+  color-scheme: light dark;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.4;
+}
+
+body {
+  margin: 2rem;
+  background-color: #f7f7f7;
+  color: #222;
+}
+
+h1 {
+  margin-bottom: 1rem;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+th {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #666;
+}
+
+.event-row img {
+  border-radius: 6px;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  background: #ddd;
+}
+
+.event-row.saving {
+  opacity: 0.55;
+}
+
+.status {
+  font-size: 0.85rem;
+  color: #1d7a46;
+}
+
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.cat-select {
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: #1d7a46;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.toast.show {
+  opacity: 1;
+}
+
+.error {
+  background: #c0392b;
+}
